@@ -12,8 +12,7 @@ let setA = rangeset.and(
 console.log(setA);
 /*
 [
-  { type: '>', value: 1 },
-  { type: '<', value: 3 },
+  { type: 'range', min: 1, max: 3, minEq: false, maxEq: false, excludes: [] }, 
 ]
 */
 
@@ -22,13 +21,17 @@ let setB = rangeset.or(
     rangeset.gte(1),
     rangeset.lte(10),
   ),
+  rangeset.and(
+    rangeset.gt(15),
+    rangeset.lt(20),
+  ),
   rangeset.eq(30),
 );
 console.log(setB);
 /*
 [
-  { type: '>=', value: 1 },
-  { type: '<=', value: 10 },
+  { type: 'range', min: 1, max: 10, minEq: true, maxEq: true, excludes: [] }, 
+  { type: 'range', min: 15, max: 20, minEq: false, maxEq: false, excludes: [] }, 
   { type: '=', value: 30 },
 ]
 */

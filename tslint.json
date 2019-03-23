@@ -4,6 +4,7 @@
     "semicolon": [true, "always"],
     "import-name": [false],
     "align": [false],
-    "prefer-template": [false]
+    "prefer-template": [false],
+    "object-shorthand-properties-first": [false]
   }
 }

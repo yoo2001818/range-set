@@ -1,11 +1,13 @@
 import { Expression, RangeSet, WildcardRangeSet, Comparator } from './type';
-import { getExprMin, getExprMax, mergeRangeSet } from './util';
+import { getExprMin, getExprMax, mergeRangeSet, comparatorWithInfinity }
+  from './util';
 
 function isWildcard<T>(set: RangeSet<T>): set is WildcardRangeSet<T> {
   return typeof set === 'object' && 'type' in set && set.type === '*';
 }
 
 export default function createRangeSet<T>(comparator: Comparator<T>) {
+  const compare = comparatorWithInfinity(comparator);
   const module = {
     eq: (value: T): RangeSet<T> => [{ type: '=', value }],
     gt: (value: T): RangeSet<T> =>
@@ -67,7 +69,21 @@ export default function createRangeSet<T>(comparator: Comparator<T>) {
       let activeExpr: Expression<T> | null = null;
       let output: RangeSet<T> = [];
       for (const expr of mergeRangeSet(comparator, a, b)) {
-
+        const max = getExprMax(expr);
+        const min = getExprMin(expr);
+        // If active expression doesn't include current expression at all,
+        // commit the expression and overwrite it.
+        if (activeExpr == null || compare(getExprMax(activeExpr), min) < 0) {
+          if (activeExpr != null) {
+            output.push(activeExpr);
+          }
+          activeExpr = expr;
+        } else {
+          // Check if we can expand upon it.
+          if (compare(getExprMax(activeExpr), max) > 0) {
+            
+          }
+        }
       }
     },
     and: (a: RangeSet<T>, b: RangeSet<T>): RangeSet<T> => {

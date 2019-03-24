@@ -1,6 +1,5 @@
-import { Expression, RangeSet, WildcardRangeSet } from './type';
-
-type Comparator<T> = (a: T, b: T) => number;
+import { Expression, RangeSet, WildcardRangeSet, Comparator } from './type';
+import { getExprMin, getExprMax, mergeRangeSet } from './util';
 
 function isWildcard<T>(set: RangeSet<T>): set is WildcardRangeSet<T> {
   return typeof set === 'object' && 'type' in set && set.type === '*';
@@ -67,31 +66,8 @@ export default function createRangeSet<T>(comparator: Comparator<T>) {
       // and use smaller one.
       let activeExpr: Expression<T> | null = null;
       let output: RangeSet<T> = [];
-      let aIndex = 0;
-      let bIndex = 0;
-      while (aIndex < a.length && bIndex < b.length) {
-        const aExpr = a[aIndex];
-        const bExpr = b[bIndex];
-        const aMin = module.getExprMin(aExpr);
-        const aMax = module.getExprMax(aExpr);
-        const bMin = module.getExprMin(bExpr);
-        const bMax = module.getExprMin(bExpr);
-        // Compare both values and advance smaller one.
-        const compared = comparator(aMin, bMin);
-        if (compared < 0) {
-          aIndex += 1;
-          // If aMax is larger than activeExpr's max value, replace activeExpr.
-          if (comparator(aMax, module.getExprMax(activeExpr)) > 0) {
-            activeExpr = aExpr;
-          }
-        } else if (compared > 0) {
-          bIndex += 1;
-          // If bMax is larger than activeExpr's max value, replace activeExpr.
-          if (comparator(bMax, module.getExprMax(activeExpr)) > 0) {
-            activeExpr = bExpr;
-          }
-        } else {
-        }
+      for (const expr of mergeRangeSet(comparator, a, b)) {
+
       }
     },
     and: (a: RangeSet<T>, b: RangeSet<T>): RangeSet<T> => {
@@ -99,12 +75,6 @@ export default function createRangeSet<T>(comparator: Comparator<T>) {
     },
     not: (a: RangeSet<T>, b: RangeSet<T>): RangeSet<T> => {
       let output: RangeSet<T> = [];
-    },
-    getExprMin: (expr: Expression<T>): T => {
-
-    },
-    getExprMax: (expr: Expression<T>): T => {
-
     },
     filter: (set: RangeSet<T>, values: T[], inverted?: boolean): T[] => {
 

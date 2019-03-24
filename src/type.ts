@@ -20,3 +20,5 @@ export type Expression<T> = CompareExpression<T> | RangeExpression<T> |
 export type WildcardRangeSet<T> = { type: '*', excludes?: T[] };
 
 export type RangeSet<T> = Expression<T>[] | WildcardRangeSet<T> | true | false;
+
+export type Comparator<T> = (a: T, b: T) => number;

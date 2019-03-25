@@ -31,6 +31,30 @@ export function getExprMax<T>(
   }
 }
 
+export function isExprMinEqual<T>(expr: Expression<T>): boolean {
+  switch (expr.type) {
+    case '>':
+      return expr.equal;
+    case '<':
+    case '=':
+      return true;
+    case 'range':
+      return expr.minEqual;
+  }
+}
+
+export function isExprMaxEqual<T>(expr: Expression<T>): boolean {
+  switch (expr.type) {
+    case '<':
+      return expr.equal;
+    case '>':
+    case '=':
+      return true;
+    case 'range':
+      return expr.maxEqual;
+  }
+}
+
 type TWithInfinity<T> = T | typeof NEGATIVE_INFINITY | typeof POSITIVE_INFINITY;
 
 export const comparatorWithInfinity = <T>(comparator: Comparator<T>) =>

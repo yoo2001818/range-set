@@ -1,6 +1,6 @@
 import { Expression, RangeSet, WildcardRangeSet, Comparator } from './type';
-import { getExprMin, getExprMax, mergeRangeSet, comparatorWithInfinity }
-  from './util';
+import { getExprMin, getExprMax, isExprMinEqual, isExprMaxEqual,
+  mergeRangeSet, comparatorWithInfinity } from './util';
 
 function isWildcard<T>(set: RangeSet<T>): set is WildcardRangeSet<T> {
   return typeof set === 'object' && 'type' in set && set.type === '*';
@@ -79,9 +79,37 @@ export default function createRangeSet<T>(comparator: Comparator<T>) {
           }
           activeExpr = expr;
         } else {
+          const compResult = compare(getExprMax(activeExpr), max);
+          // Check for its excludes list.
           // Check if we can expand upon it.
-          if (compare(getExprMax(activeExpr), max) > 0) {
-            
+          if (compResult < 0) {
+            // If activeExpr is '=', escalate itself into minEqual: true.
+            switch (activeExpr.type) {
+              case '=':
+                switch (expr.type) {
+                  case 'range':
+                    activeExpr = { ...expr, minEqual: true };
+                    break;
+                  case '<':
+                    activeExpr = { ...expr, equal: true };
+                    break;
+                  default:
+                    activeExpr = expr;
+                    break;
+                }
+                break;
+            }
+          } else if (compResult === 0) {
+            // If activeExpr is not '=', and itself is '=', set maxEqual: true.
+            const isMaxEqual = isExprMaxEqual(expr);
+            switch (activeExpr.type) {
+              case '<':
+                activeExpr.equal = activeExpr.equal || isMaxEqual;
+                break;
+              case 'range':
+                activeExpr.maxEqual = activeExpr.maxEqual || isMaxEqual;
+                break;
+            }
           }
         }
       }

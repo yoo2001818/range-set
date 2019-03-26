@@ -18,6 +18,12 @@ export default function createRangeSet<T>(comparator: Comparator<T>) {
       [{ type: '<', value, equal: false }],
     lte: (value: T): RangeSet<T> =>
       [{ type: '<', value, equal: true }],
+    range: (
+      min: T,
+      max: T,
+      minEqual: boolean = false,
+      maxEqual: boolean = false,
+    ): RangeSet<T> => ([{ type: 'range', min, max, minEqual, maxEqual }]),
     neq: (value: T): RangeSet<T> => ({ type: '*', excludes: [value] }),
     in: (values: T[]): RangeSet<T> =>
       values.map(value => ({ type: '=' as '=', value })),
@@ -113,21 +119,27 @@ export default function createRangeSet<T>(comparator: Comparator<T>) {
           }
         }
       }
+      if (activeExpr != null) {
+        output.push(activeExpr);
+      }
+      return output;
     },
     and: (a: RangeSet<T>, b: RangeSet<T>): RangeSet<T> => {
       let output: RangeSet<T> = [];
+      return output;
     },
     not: (a: RangeSet<T>, b: RangeSet<T>): RangeSet<T> => {
       let output: RangeSet<T> = [];
+      return output;
     },
     filter: (set: RangeSet<T>, values: T[], inverted?: boolean): T[] => {
-
+      return [];
     },
     testSeries: (set: RangeSet<T>, values: T[]): boolean[] => {
-
+      return [];
     },
     test: (set: RangeSet<T>, value: T): boolean => {
-
+      return false;
     },
   };
   return module;

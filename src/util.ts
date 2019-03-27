@@ -55,7 +55,8 @@ export function isExprMaxEqual<T>(expr: Expression<T>): boolean {
   }
 }
 
-type TWithInfinity<T> = T | typeof NEGATIVE_INFINITY | typeof POSITIVE_INFINITY;
+export type TWithInfinity<T> =
+  T | typeof NEGATIVE_INFINITY | typeof POSITIVE_INFINITY;
 
 export const comparatorWithInfinity = <T>(comparator: Comparator<T>) =>
   (a: TWithInfinity<T>, b: TWithInfinity<T>): number => {

@@ -1,3 +1,7 @@
+import { Comparator } from './type';
+import { POSITIVE_INFINITY, NEGATIVE_INFINITY, TWithInfinity,
+  comparatorWithInfinity } from './util';
+
 export type AllRange<T> = {
   type: '*',
   excludes?: T[],
@@ -24,46 +28,32 @@ export type EqRange<T> = { type: '=', value: T };
 export type Range<T> = AllRange<T> | InfiniteRange<T> | FiniteRange<T> |
   EqRange<T>;
 
-export function eq<T>(value: T): EqRange<T> {
-  return { type: '=', value };
-}
-export function gt<T>(value: T): InfiniteRange<T> {
-  return { type: '>', value, equal: false };
-}
-export function gte<T>(value: T): InfiniteRange<T> {
-  return { type: '>', value, equal: true };
-}
-export function lt<T>(value: T): InfiniteRange<T> {
-  return { type: '<', value, equal: false };
-}
-export function lte<T>(value: T): InfiniteRange<T> {
-  return { type: '<', value, equal: true };
-}
-export function all<T>(value: T): AllRange<T> {
-  return { type: '*' };
-}
-export function range<T>(
-  min: T, max: T, minEqual: boolean = false, maxEqual: boolean = false,
-): FiniteRange<T> {
-  return {
-    type: 'range', min, max, minEqual, maxEqual,
+export default function createRangeSet<T>(comparator: Comparator<T>) {
+  const compare = comparatorWithInfinity(comparator);
+  const module = {
+    eq: (value: T): EqRange<T> => ({ type: '=', value }),
+    gt: (value: T): InfiniteRange<T> => ({ type: '>', value, equal: false }),
+    gte: (value: T): InfiniteRange<T> => ({ type: '>', value, equal: true }),
+    lt: (value: T): InfiniteRange<T> => ({ type: '<', value, equal: false }),
+    lte: (value: T): InfiniteRange<T> => ({ type: '<', value, equal: true }),
+    all: (): AllRange<T> => ({ type: '*' }),
+    range: (
+      min: T,
+      max: T,
+      minEqual: boolean = false,
+      maxEqual: boolean = false,
+    ): FiniteRange<T> => ({
+      type: 'range', min, max, minEqual, maxEqual,
+    }),
+    setMax: (
+      range: Range<T>,
+      max: TWithInfinity<T>,
+      maxEqual: boolean = false,
+    ): Range<T> => {},
+    setMin: (
+      range: Range<T>,
+      max: TWithInfinity<T>,
+      maxEqual: boolean = false,
+    ): Range<T> => {},
   };
-}
-
-export function setMax<T>(
-  range: Range<T>, max: T, maxEqual: boolean = false,
-): Range<T> {
-
-}
-export function setMaxInfinite<T>(range: Range<T>): Range<T> {
-
-}
-
-export function setMin<T>(
-  range: Range<T>, min: T, minEqual: boolean = false,
-): Range<T> {
-
-}
-export function setMinInfinite<T>(range: Range<T>): Range<T> {
-
 }

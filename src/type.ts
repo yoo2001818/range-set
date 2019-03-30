@@ -21,4 +21,10 @@ export type WildcardRangeSet<T> = { type: '*', excludes?: T[] };
 
 export type RangeSet<T> = Expression<T>[] | WildcardRangeSet<T> | true | false;
 
-export type Comparator<T> = (a: T, b: T) => number;
+export type SetDescriptor<T> = {
+  compare: (a: T, b: T) => number,
+  isPositiveInfinity: (value: T) => boolean,
+  isNegativeInfinity: (value: T) => boolean,
+  positiveInfinity: T,
+  negativeInfinity: T,
+};

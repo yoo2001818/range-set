@@ -1,59 +1,82 @@
-import { Comparator } from './type';
-import { POSITIVE_INFINITY, NEGATIVE_INFINITY, TWithInfinity,
-  comparatorWithInfinity } from './util';
+import { SetDescriptor } from './type';
 
-export type AllRange<T> = {
-  type: '*',
-  excludes?: T[],
-};
-
-export type InfiniteRange<T> = {
-  type: '<' | '>',
-  value: T,
-  equal: boolean,
-  excludes?: T[],
-};
-
-export type FiniteRange<T> = {
-  type: 'range',
+export type Range<T> = {
   min: T,
   max: T,
   minEqual: boolean,
   maxEqual: boolean,
-  excludes?: T[],
+  excludes: T[],
 };
 
-export type EqRange<T> = { type: '=', value: T };
-
-export type Range<T> = AllRange<T> | InfiniteRange<T> | FiniteRange<T> |
-  EqRange<T>;
-
-export default function createRangeSet<T>(comparator: Comparator<T>) {
-  const compare = comparatorWithInfinity(comparator);
+export default function createRangeSet<T>(descriptor: SetDescriptor<T>) {
   const module = {
-    eq: (value: T): EqRange<T> => ({ type: '=', value }),
-    gt: (value: T): InfiniteRange<T> => ({ type: '>', value, equal: false }),
-    gte: (value: T): InfiniteRange<T> => ({ type: '>', value, equal: true }),
-    lt: (value: T): InfiniteRange<T> => ({ type: '<', value, equal: false }),
-    lte: (value: T): InfiniteRange<T> => ({ type: '<', value, equal: true }),
-    all: (): AllRange<T> => ({ type: '*' }),
+    eq: (value: T): Range<T> => ({
+      min: value,
+      max: value,
+      minEqual: true,
+      maxEqual: true,
+      excludes: [],
+    }),
+    gt: (value: T): Range<T> => ({
+      min: value,
+      max: descriptor.negativeInfinity,
+      minEqual: false,
+      maxEqual: true,
+      excludes: [],
+    }),
+    gte: (value: T): Range<T> => ({
+      min: value,
+      max: descriptor.negativeInfinity,
+      minEqual: true,
+      maxEqual: true,
+      excludes: [],
+    }),
+    lt: (value: T): Range<T> => ({
+      min: descriptor.negativeInfinity,
+      max: value,
+      minEqual: true,
+      maxEqual: false,
+      excludes: [],
+    }),
+    lte: (value: T): Range<T> => ({
+      min: descriptor.negativeInfinity,
+      max: value,
+      minEqual: true,
+      maxEqual: true,
+      excludes: [],
+    }),
+    all: (value: T): Range<T> => ({
+      min: descriptor.negativeInfinity,
+      max: descriptor.positiveInfinity,
+      minEqual: true,
+      maxEqual: true,
+      excludes: [],
+    }),
     range: (
       min: T,
       max: T,
       minEqual: boolean = false,
       maxEqual: boolean = false,
-    ): FiniteRange<T> => ({
-      type: 'range', min, max, minEqual, maxEqual,
+    ): Range<T> => ({
+      min, max, minEqual, maxEqual, excludes: [],
     }),
     setMax: (
       range: Range<T>,
-      max: TWithInfinity<T>,
+      max: T,
       maxEqual: boolean = false,
-    ): Range<T> => {},
+    ): Range<T> => ({
+      ...range,
+      max,
+      maxEqual,
+    }),
     setMin: (
       range: Range<T>,
-      max: TWithInfinity<T>,
-      maxEqual: boolean = false,
-    ): Range<T> => {},
+      min: T,
+      minEqual: boolean = false,
+    ): Range<T> => ({
+      ...range,
+      min,
+      minEqual,
+    }),
   };
 }

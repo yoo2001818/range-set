@@ -1,4 +1,5 @@
 import { SetDescriptor } from './type';
+import { findValue } from './util';
 
 export type Range<T> = {
   min: T,
@@ -68,6 +69,9 @@ export default function createRangeSet<T>(descriptor: SetDescriptor<T>) {
       ...range,
       max,
       maxEqual,
+      excludes: range.excludes != null ?
+        module.sliceExcludes(range.excludes, range.min, max) :
+        [],
     }),
     setMin: (
       range: Range<T>,
@@ -77,6 +81,17 @@ export default function createRangeSet<T>(descriptor: SetDescriptor<T>) {
       ...range,
       min,
       minEqual,
+      excludes: range.excludes != null ?
+        module.sliceExcludes(range.excludes, min, range.max) :
+        [],
     }),
+    test: (range: Range<T>, value: T): boolean => {
+
+    },
+    sliceExcludes: (excludes: T[], min: T, max: T): T[] => {
+      const minPos = findValue(excludes, min, descriptor.compare);
+      const maxPos = findValue(excludes, min, descriptor.compare);
+      return excludes.slice(minPos.pos, maxPos.pos + 1);
+    },
   };
 }

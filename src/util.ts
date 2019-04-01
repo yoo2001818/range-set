@@ -1,4 +1,4 @@
-import { Comparator, RangeSet, Expression } from './type';
+import { RangeSet, Expression } from './type';
 
 export const POSITIVE_INFINITY = Symbol('+Infinity');
 export const NEGATIVE_INFINITY = Symbol('-Infinity');
@@ -13,7 +13,7 @@ export function findValue<T>(
     const comp = compare(list[mid], value);
     if (comp < 0) {
       min = mid + 1;
-    } else if (comp < 0) {
+    } else if (comp > 0) {
       max = mid - 1;
     } else {
       return { pos: mid, match: true };
@@ -74,26 +74,7 @@ export function isExprMaxEqual<T>(expr: Expression<T>): boolean {
   }
 }
 
-export type TWithInfinity<T> =
-  T | typeof NEGATIVE_INFINITY | typeof POSITIVE_INFINITY;
-
-export const comparatorWithInfinity = <T>(comparator: Comparator<T>) =>
-  (a: TWithInfinity<T>, b: TWithInfinity<T>): number => {
-    if (a === NEGATIVE_INFINITY) {
-      return -1;
-    }
-    if (a === POSITIVE_INFINITY) {
-      return 1;
-    }
-    if (b === NEGATIVE_INFINITY) {
-      return -1;
-    }
-    if (b === POSITIVE_INFINITY) {
-      return 1;
-    }
-    return comparator(a, b);
-  };
-
+/*
 export function * mergeRangeSet<T>(
   comparator: Comparator<T>,
   ...exprs: Expression<T>[][]
@@ -122,3 +103,4 @@ export function * mergeRangeSet<T>(
     }
   }
 }
+*/

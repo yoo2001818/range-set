@@ -9,7 +9,7 @@ export type Range<T> = {
   excludes: T[],
 };
 
-export default function createRangeSet<T>(descriptor: SetDescriptor<T>) {
+export default function createRangeModule<T>(descriptor: SetDescriptor<T>) {
   const module = {
     eq: (value: T): Range<T> => ({
       min: value,
@@ -20,14 +20,14 @@ export default function createRangeSet<T>(descriptor: SetDescriptor<T>) {
     }),
     gt: (value: T): Range<T> => ({
       min: value,
-      max: descriptor.negativeInfinity,
+      max: descriptor.positiveInfinity,
       minEqual: false,
       maxEqual: true,
       excludes: [],
     }),
     gte: (value: T): Range<T> => ({
       min: value,
-      max: descriptor.negativeInfinity,
+      max: descriptor.positiveInfinity,
       minEqual: true,
       maxEqual: true,
       excludes: [],
@@ -46,7 +46,7 @@ export default function createRangeSet<T>(descriptor: SetDescriptor<T>) {
       maxEqual: true,
       excludes: [],
     }),
-    all: (value: T): Range<T> => ({
+    all: (): Range<T> => ({
       min: descriptor.negativeInfinity,
       max: descriptor.positiveInfinity,
       minEqual: true,
@@ -85,13 +85,29 @@ export default function createRangeSet<T>(descriptor: SetDescriptor<T>) {
         module.sliceExcludes(range.excludes, min, range.max) :
         [],
     }),
+    isValid: (range: Range<T>): boolean => {
+      const comp = descriptor.compare(range.min, range.max);
+      if (comp > 0) {
+        return false;
+      }
+      if (comp === 0) {
+        return range.minEqual && range.maxEqual &&
+          (range.excludes == null || range.excludes.length === 0);
+      }
+      return true;
+    },
     test: (range: Range<T>, value: T): boolean => {
-
+      const compMin = descriptor.compare(range.min, value);
+      const compMax = descriptor.compare(value, range.max);
+      return (range.minEqual ? compMin <= 0 : compMin < 0) &&
+        (range.maxEqual ? compMax <= 0 : compMax < 0) &&
+        !(findValue(range.excludes, value, descriptor.compare).match);
     },
     sliceExcludes: (excludes: T[], min: T, max: T): T[] => {
       const minPos = findValue(excludes, min, descriptor.compare);
-      const maxPos = findValue(excludes, min, descriptor.compare);
+      const maxPos = findValue(excludes, max, descriptor.compare);
       return excludes.slice(minPos.pos, maxPos.pos + 1);
     },
   };
+  return module;
 }

@@ -7,7 +7,7 @@ function isWildcard<T>(set: RangeSet<T>): set is WildcardRangeSet<T> {
   return typeof set === 'object' && 'type' in set && set.type === '*';
 }
 
-export default function createRangeSet<T>(comparator: Comparator<T>) {
+export default function createRangeSetModule<T>(comparator: Comparator<T>) {
   const compare = comparatorWithInfinity(comparator);
   const module = {
     eq: (value: T): RangeSet<T> => [{ type: '=', value }],

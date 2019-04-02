@@ -85,6 +85,32 @@ export default function createRangeModule<T>(descriptor: SetDescriptor<T>) {
         module.sliceExcludes(range.excludes, min, range.max) :
         [],
     }),
+    union: (a: Range<T>, b: Range<T>): Range<T> => {
+      const compMin = descriptor.compare(a.min, b.min);
+      const compMax = descriptor.compare(a.max, b.max);
+      return {
+        min: compMin < 0 ? a.min : b.min,
+        max: compMax > 0 ? a.max : b.max,
+        minEqual: compMin < 0 ? a.minEqual :
+          (compMin > 0 ? b.minEqual : a.minEqual || b.minEqual),
+        maxEqual: compMax > 0 ? a.maxEqual :
+          (compMax < 0 ? b.maxEqual : a.maxEqual || b.maxEqual),
+        excludes: [],
+      };
+    },
+    intersection: (a: Range<T>, b: Range<T>): Range<T> => {
+      const compMin = descriptor.compare(a.min, b.min);
+      const compMax = descriptor.compare(a.max, b.max);
+      return {
+        min: compMin > 0 ? a.min : b.min,
+        max: compMax < 0 ? a.max : b.max,
+        minEqual: compMin > 0 ? a.minEqual :
+          (compMin < 0 ? b.minEqual : a.minEqual && b.minEqual),
+        maxEqual: compMax < 0 ? a.maxEqual :
+          (compMax > 0 ? b.maxEqual : a.maxEqual && b.maxEqual),
+        excludes: [],
+      };
+    },
     isValid: (range: Range<T>): boolean => {
       const comp = descriptor.compare(range.min, range.max);
       if (comp > 0) {

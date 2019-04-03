@@ -1,5 +1,5 @@
 import { SetDescriptor } from './type';
-import { findValue } from './util';
+import { findValue, unionValues, intersectionValues } from './util';
 
 export type Range<T> = {
   min: T,
@@ -95,7 +95,9 @@ export default function createRangeModule<T>(descriptor: SetDescriptor<T>) {
           (compMin > 0 ? b.minEqual : a.minEqual || b.minEqual),
         maxEqual: compMax > 0 ? a.maxEqual :
           (compMax < 0 ? b.maxEqual : a.maxEqual || b.maxEqual),
-        excludes: [],
+        excludes: a.excludes != null && b.excludes != null ?
+          unionValues(a.excludes, b.excludes, descriptor.compare) :
+          (a.excludes != null ? a.excludes : b.excludes),
       };
     },
     intersection: (a: Range<T>, b: Range<T>): Range<T> => {
@@ -108,7 +110,9 @@ export default function createRangeModule<T>(descriptor: SetDescriptor<T>) {
           (compMin < 0 ? b.minEqual : a.minEqual && b.minEqual),
         maxEqual: compMax < 0 ? a.maxEqual :
           (compMax > 0 ? b.maxEqual : a.maxEqual && b.maxEqual),
-        excludes: [],
+        excludes: a.excludes != null && b.excludes != null ?
+          intersectionValues(a.excludes, b.excludes, descriptor.compare) :
+          (a.excludes != null ? a.excludes : b.excludes),
       };
     },
     isValid: (range: Range<T>): boolean => {

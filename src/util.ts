@@ -22,6 +22,56 @@ export function findValue<T>(
   return { pos: min, match: false };
 }
 
+export function unionValues<T>(
+  a: T[], b: T[], compare: (a: T, b: T) => number,
+): T[] {
+  let aPos = 0;
+  let bPos = 0;
+  const output: T[] = [];
+  while (aPos < a.length && bPos < b.length) {
+    const comp = compare(a[aPos], b[bPos]);
+    if (comp < 0) {
+      output.push(a[aPos]);
+      aPos += 1;
+    } else if (comp > 0) {
+      output.push(b[bPos]);
+      bPos += 1;
+    } else {
+      output.push(a[aPos]);
+      aPos += 1;
+    }
+  }
+  while (aPos < a.length) {
+    output.push(a[aPos]);
+    aPos += 1;
+  }
+  while (bPos < b.length) {
+    output.push(b[bPos]);
+    bPos += 1;
+  }
+  return output;
+}
+
+export function intersectionValues<T>(
+  a: T[], b: T[], compare: (a: T, b: T) => number,
+): T[] {
+  let aPos = 0;
+  let bPos = 0;
+  const output: T[] = [];
+  while (aPos < a.length && bPos < b.length) {
+    const comp = compare(a[aPos], b[bPos]);
+    if (comp < 0) {
+      aPos += 1;
+    } else if (comp > 0) {
+      bPos += 1;
+    } else {
+      output.push(a[aPos]);
+      aPos += 1;
+    }
+  }
+  return output;
+}
+
 export function getExprMin<T>(
   expr: Expression<T>,
 ): T | typeof NEGATIVE_INFINITY {

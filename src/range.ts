@@ -96,7 +96,7 @@ export default function createRangeModule<T>(descriptor: SetDescriptor<T>) {
         maxEqual: compMax > 0 ? a.maxEqual :
           (compMax < 0 ? b.maxEqual : a.maxEqual || b.maxEqual),
         excludes: a.excludes != null && b.excludes != null ?
-          unionValues(a.excludes, b.excludes, descriptor.compare) :
+          intersectionValues(a.excludes, b.excludes, descriptor.compare) :
           (a.excludes != null ? a.excludes : b.excludes),
       };
     },
@@ -111,7 +111,7 @@ export default function createRangeModule<T>(descriptor: SetDescriptor<T>) {
         maxEqual: compMax < 0 ? a.maxEqual :
           (compMax > 0 ? b.maxEqual : a.maxEqual && b.maxEqual),
         excludes: a.excludes != null && b.excludes != null ?
-          intersectionValues(a.excludes, b.excludes, descriptor.compare) :
+          unionValues(a.excludes, b.excludes, descriptor.compare) :
           (a.excludes != null ? a.excludes : b.excludes),
       };
     },

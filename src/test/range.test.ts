@@ -155,6 +155,108 @@ describe('range', () => {
       });
     });
   });
+  describe('union', () => {
+    it('should merge two ranges', () => {
+      expect(module.union(
+        module.range(2, 5, true, false),
+        module.gt(4),
+      )).toEqual({
+        min: 2,
+        max: Infinity,
+        minEqual: true,
+        maxEqual: true,
+        excludes: [],
+      });
+      expect(module.union(
+        module.range(2, 5, true, false),
+        module.lt(5),
+      )).toEqual({
+        min: -Infinity,
+        max: 5,
+        minEqual: true,
+        maxEqual: false,
+        excludes: [],
+      });
+    });
+    it('should merge excludes', () => {
+      expect(module.union({
+        min: 0,
+        max: 10,
+        minEqual: true,
+        maxEqual: true,
+        excludes: [1, 2, 5, 7, 9],
+      }, {
+        min: 5,
+        max: 15,
+        minEqual: true,
+        maxEqual: true,
+        excludes: [5, 7, 8, 9, 10, 15],
+      })).toEqual({
+        min: 0,
+        max: 15,
+        minEqual: true,
+        maxEqual: true,
+        excludes: [1, 2, 5, 7, 9, 15],
+      });
+    });
+  });
+  describe('intersection', () => {
+    it('should merge two ranges', () => {
+      expect(module.intersection(
+        module.range(2, 5, true, false),
+        module.range(4, 10, true, false),
+      )).toEqual({
+        min: 4,
+        max: 5,
+        minEqual: true,
+        maxEqual: false,
+        excludes: [],
+      });
+      expect(module.intersection(
+        module.gte(3),
+        module.lt(5)),
+      ).toEqual({
+        min: 3,
+        max: 5,
+        minEqual: true,
+        maxEqual: false,
+        excludes: [],
+      });
+    });
+    it('should return invalid range if not met', () => {
+      expect(module.intersection(
+        module.gt(10),
+        module.lt(5)),
+      ).toEqual({
+        min: 10,
+        max: 5,
+        minEqual: false,
+        maxEqual: false,
+        excludes: [],
+      });
+    });
+    it('should merge excludes', () => {
+      expect(module.intersection({
+        min: 0,
+        max: 10,
+        minEqual: true,
+        maxEqual: true,
+        excludes: [1, 2, 5, 7, 9],
+      }, {
+        min: 5,
+        max: 15,
+        minEqual: true,
+        maxEqual: true,
+        excludes: [5, 7, 8, 9, 10, 15],
+      })).toEqual({
+        min: 5,
+        max: 10,
+        minEqual: true,
+        maxEqual: true,
+        excludes: [5, 7, 8, 9],
+      });
+    });
+  });
   describe('isValid', () => {
     it('should pass correct ranges', () => {
       expect(module.isValid(module.range(1, 5, false, false))).toBe(true);

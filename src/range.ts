@@ -88,9 +88,11 @@ export default function createRangeModule<T>(descriptor: SetDescriptor<T>) {
     union: (a: Range<T>, b: Range<T>): Range<T> => {
       const compMin = descriptor.compare(a.min, b.min);
       const compMax = descriptor.compare(a.max, b.max);
+      const min = compMin < 0 ? a.min : b.min;
+      const max = compMax > 0 ? a.max : b.max;
       return {
-        min: compMin < 0 ? a.min : b.min,
-        max: compMax > 0 ? a.max : b.max,
+        min,
+        max,
         minEqual: compMin < 0 ? a.minEqual :
           (compMin > 0 ? b.minEqual : a.minEqual || b.minEqual),
         maxEqual: compMax > 0 ? a.maxEqual :
@@ -103,9 +105,11 @@ export default function createRangeModule<T>(descriptor: SetDescriptor<T>) {
     intersection: (a: Range<T>, b: Range<T>): Range<T> => {
       const compMin = descriptor.compare(a.min, b.min);
       const compMax = descriptor.compare(a.max, b.max);
+      const min = compMin > 0 ? a.min : b.min;
+      const max = compMax < 0 ? a.max : b.max;
       return {
-        min: compMin > 0 ? a.min : b.min,
-        max: compMax < 0 ? a.max : b.max,
+        min,
+        max,
         minEqual: compMin > 0 ? a.minEqual :
           (compMin < 0 ? b.minEqual : a.minEqual && b.minEqual),
         maxEqual: compMax < 0 ? a.maxEqual :

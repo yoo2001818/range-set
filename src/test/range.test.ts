@@ -253,7 +253,7 @@ describe('range', () => {
         max: 10,
         minEqual: true,
         maxEqual: true,
-        excludes: [5, 7, 8, 9],
+        excludes: [5, 7, 8, 9, 10],
       });
     });
   });

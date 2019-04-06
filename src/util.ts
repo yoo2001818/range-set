@@ -74,22 +74,36 @@ export function intersectionValues<T>(
   return output;
 }
 
-export function zipValues<T>(
-  a: T[], b: T[], compare: (a: T, b: T) => number,
-): { value: T, a: boolean, b: boolean }[] {
+export function unionFilterValues<T>(
+  a: T[],
+  b: T[],
+  compare: (a: T, b: T) => number,
+  filter: (value: T, a: boolean, b: boolean) => boolean,
+): T[] {
   let aPos = 0;
   let bPos = 0;
-  const output: { value: T, a: boolean, b: boolean }[] = [];
+  const output: T[] = [];
   while (aPos < a.length && bPos < b.length) {
     const comp = compare(a[aPos], b[bPos]);
     if (comp < 0) {
+      if (filter(a[aPos], true, false)) output.push(a[aPos]);
       aPos += 1;
     } else if (comp > 0) {
+      if (filter(b[bPos], false, true)) output.push(b[bPos]);
       bPos += 1;
     } else {
+      if (filter(a[aPos], true, true)) output.push(a[aPos]);
       aPos += 1;
       bPos += 1;
     }
+  }
+  while (aPos < a.length) {
+    if (filter(a[aPos], true, false)) output.push(a[aPos]);
+    aPos += 1;
+  }
+  while (bPos < b.length) {
+    if (filter(b[bPos], false, true)) output.push(b[bPos]);
+    bPos += 1;
   }
   return output;
 }

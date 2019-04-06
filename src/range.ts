@@ -69,9 +69,7 @@ export default function createRangeModule<T>(descriptor: SetDescriptor<T>) {
       ...range,
       max,
       maxEqual,
-      excludes: range.excludes != null ?
-        module.sliceExcludes(range.excludes, range.min, max) :
-        [],
+      excludes: module.sliceExcludes(range.excludes, range.min, max),
     }),
     setMin: (
       range: Range<T>,
@@ -81,9 +79,7 @@ export default function createRangeModule<T>(descriptor: SetDescriptor<T>) {
       ...range,
       min,
       minEqual,
-      excludes: range.excludes != null ?
-        module.sliceExcludes(range.excludes, min, range.max) :
-        [],
+      excludes: module.sliceExcludes(range.excludes, min, range.max),
     }),
     union: (a: Range<T>, b: Range<T>): Range<T> => {
       const compMin = descriptor.compare(a.min, b.min);
@@ -99,14 +95,12 @@ export default function createRangeModule<T>(descriptor: SetDescriptor<T>) {
           (compMin > 0 ? b.minEqual : a.minEqual || b.minEqual),
         maxEqual: compMax > 0 ? a.maxEqual :
           (compMax < 0 ? b.maxEqual : a.maxEqual || b.maxEqual),
-        excludes: a.excludes != null && b.excludes != null ?
-          unionFilterValues(a.excludes, b.excludes, descriptor.compare,
-            (value, a, b) => {
-              if (descriptor.compare(value, minMax) < 0) return true;
-              if (descriptor.compare(value, maxMin) > 0) return true;
-              return a && b;
-            }) :
-          (a.excludes != null ? a.excludes : b.excludes),
+        excludes: unionFilterValues(a.excludes, b.excludes, descriptor.compare,
+          (value, a, b) => {
+            if (descriptor.compare(value, minMax) < 0) return true;
+            if (descriptor.compare(value, maxMin) > 0) return true;
+            return a && b;
+          }),
       };
     },
     intersection: (a: Range<T>, b: Range<T>): Range<T> => {
@@ -121,14 +115,12 @@ export default function createRangeModule<T>(descriptor: SetDescriptor<T>) {
           (compMin < 0 ? b.minEqual : a.minEqual && b.minEqual),
         maxEqual: compMax < 0 ? a.maxEqual :
           (compMax > 0 ? b.maxEqual : a.maxEqual && b.maxEqual),
-        excludes: a.excludes != null && b.excludes != null ?
-          unionFilterValues(a.excludes, b.excludes, descriptor.compare,
-            (value, a, b) => {
-              if (descriptor.compare(value, minMax) < 0) return false;
-              if (descriptor.compare(value, maxMin) > 0) return false;
-              return a || b;
-            }) :
-          (a.excludes != null ? a.excludes : b.excludes),
+        excludes: unionFilterValues(a.excludes, b.excludes, descriptor.compare,
+          (value, a, b) => {
+            if (descriptor.compare(value, minMax) < 0) return false;
+            if (descriptor.compare(value, maxMin) > 0) return false;
+            return a || b;
+          }),
       };
     },
     isValid: (range: Range<T>): boolean => {

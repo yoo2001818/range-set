@@ -1,5 +1,5 @@
 import { SetDescriptor } from './type';
-import { findValue, unionValues, intersectionValues, unionFilterValues } from './util';
+import { findValue, unionFilterValues } from './util';
 
 export type Range<T> = {
   min: T,

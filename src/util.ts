@@ -1,5 +1,3 @@
-import { RangeSet, Expression } from './type';
-
 export const POSITIVE_INFINITY = Symbol('+Infinity');
 export const NEGATIVE_INFINITY = Symbol('-Infinity');
 
@@ -106,58 +104,6 @@ export function unionFilterValues<T>(
     bPos += 1;
   }
   return output;
-}
-
-export function getExprMin<T>(
-  expr: Expression<T>,
-): T | typeof NEGATIVE_INFINITY {
-  switch (expr.type) {
-    case '<':
-      return NEGATIVE_INFINITY;
-    case '>':
-    case '=':
-      return expr.value;
-    case 'range':
-      return expr.min;
-  }
-}
-
-export function getExprMax<T>(
-  expr: Expression<T>,
-): T | typeof POSITIVE_INFINITY {
-  switch (expr.type) {
-    case '>':
-      return POSITIVE_INFINITY;
-    case '<':
-    case '=':
-      return expr.value;
-    case 'range':
-      return expr.max;
-  }
-}
-
-export function isExprMinEqual<T>(expr: Expression<T>): boolean {
-  switch (expr.type) {
-    case '>':
-      return expr.equal;
-    case '<':
-    case '=':
-      return true;
-    case 'range':
-      return expr.minEqual;
-  }
-}
-
-export function isExprMaxEqual<T>(expr: Expression<T>): boolean {
-  switch (expr.type) {
-    case '<':
-      return expr.equal;
-    case '>':
-    case '=':
-      return true;
-    case 'range':
-      return expr.maxEqual;
-  }
 }
 
 /*

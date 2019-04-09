@@ -1,25 +1,48 @@
-import createRangeSet from '../index';
+import createRangeSetModule from '../index';
 
 describe('index', () => {
-  const rangeSet = createRangeSet((a: number, b: number) => a - b);
-  describe('or', () => {
+  const module = createRangeSetModule({
+    compare: (a: number, b: number) => a - b,
+    isPositiveInfinity: (v: number) => v === Infinity,
+    isNegativeInfinity: (v: number) => v === -Infinity,
+    positiveInfinity: Infinity,
+    negativeInfinity: -Infinity,
+  });
+  describe('union', () => {
     it('should merge gte / range', () => {
-      expect(rangeSet.or(
-        rangeSet.range(1, 5),
-        rangeSet.gte(5),
-      )).toEqual({});
+      expect(module.union(
+        module.range(1, 5),
+        module.gte(5),
+      )).toEqual(module.gt(1));
+    });
+    it('should merge two ranges without minEqual / maxEqual', () => {
+      expect(module.union(
+        module.range(1, 5),
+        module.range(5, 10),
+      )).toEqual([
+        module.rangeModule.range(1, 5),
+        module.rangeModule.range(5, 10),
+      ]);
     });
     it('should merge two ranges with excludes', () => {
-      expect(rangeSet.or(
-        rangeSet.range(1, 5),
-        rangeSet.range(5, 10),
-      )).toEqual({});
+      expect(module.union(
+        module.range(1, 5),
+        module.range(5, 10, true, true),
+      )).toEqual(module.range(1, 10, false, true));
     });
-    it('should merge two ranges with excludes', () => {
-      expect(rangeSet.or(
-        rangeSet.range(1, 5),
-        rangeSet.range(5, 10, true),
-      )).toEqual({});
+    it('should merge multiple instances', () => {
+      expect(module.union(
+        module.range(1, 10),
+        [
+          module.rangeModule.range(-1, 5),
+          module.rangeModule.range(5, 8),
+          module.rangeModule.range(10, 12, true),
+          module.rangeModule.range(20, 30),
+        ]
+      )).toEqual([
+        module.rangeModule.range(-1, 12),
+        module.rangeModule.range(20, 30),
+      ]);
     });
   });
 });

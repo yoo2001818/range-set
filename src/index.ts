@@ -6,6 +6,7 @@ export type RangeSet<T> = Range<T>[];
 export default function createRangeSetModule<T>(descriptor: SetDescriptor<T>) {
   const rangeModule = createRangeModule(descriptor);
   const module = {
+    rangeModule,
     eq: (value: T): RangeSet<T> => [rangeModule.eq(value)],
     gt: (value: T): RangeSet<T> => [rangeModule.gt(value)],
     gte: (value: T): RangeSet<T> => [rangeModule.gte(value)],
@@ -22,6 +23,19 @@ export default function createRangeSetModule<T>(descriptor: SetDescriptor<T>) {
       return [];
     },
     union: (a: RangeSet<T>, b: RangeSet<T>): RangeSet<T> => {
+      function process(current: Range<T>) {
+        if (active != null) {
+          const compared = descriptor.compare(active.max, current.min);
+          if (compared > 0 ||
+            (compared === 0 && (active.maxEqual || current.minEqual))
+          ) {
+            active = rangeModule.union(active, current);
+            return;
+          }
+          output.push(active);
+        }
+        active = current;
+      }
       let active: Range<T> | null = null;
       let aPos = 0;
       let bPos = 0;
@@ -29,30 +43,23 @@ export default function createRangeSetModule<T>(descriptor: SetDescriptor<T>) {
       while (aPos < a.length && bPos < b.length) {
         const comp = descriptor.compare(a[aPos].min, b[bPos].min);
         if (comp <= 0) {
-          const current = a[aPos];
+          process(a[aPos]);
           aPos += 1;
-          if (active != null &&
-            descriptor.compare(active.max, current.min) < 0
-          ) {
-            active = rangeModule.union(active, current);
-          } else {
-            if (active != null) output.push(active);
-            active = current;
-          }
         }
         if (comp >= 0) {
-          const current = b[bPos];
+          process(b[bPos]);
           bPos += 1;
-          if (active != null &&
-            descriptor.compare(active.max, current.min) < 0
-          ) {
-            active = rangeModule.union(active, current);
-          } else {
-            if (active != null) output.push(active);
-            active = current;
-          }
         }
       }
+      while (aPos < a.length) {
+        process(a[aPos]);
+        aPos += 1;
+      }
+      while (bPos < b.length) {
+        process(b[bPos]);
+        bPos += 1;
+      }
+      if (active != null) output.push(active);
       return output;
     },
     intersection: (a: RangeSet<T>, b: RangeSet<T>): RangeSet<T> => {

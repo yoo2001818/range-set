@@ -15,7 +15,6 @@ describe('range', () => {
         max: 34,
         minEqual: true,
         maxEqual: true,
-        excludes: [],
       });
     });
   });
@@ -26,7 +25,6 @@ describe('range', () => {
         max: Infinity,
         minEqual: false,
         maxEqual: true,
-        excludes: [],
       });
     });
   });
@@ -37,7 +35,6 @@ describe('range', () => {
         max: Infinity,
         minEqual: true,
         maxEqual: true,
-        excludes: [],
       });
     });
   });
@@ -48,7 +45,6 @@ describe('range', () => {
         max: 1,
         minEqual: true,
         maxEqual: false,
-        excludes: [],
       });
     });
   });
@@ -59,7 +55,6 @@ describe('range', () => {
         max: 1,
         minEqual: true,
         maxEqual: true,
-        excludes: [],
       });
     });
   });
@@ -70,7 +65,6 @@ describe('range', () => {
         max: Infinity,
         minEqual: true,
         maxEqual: true,
-        excludes: [],
       });
     });
   });
@@ -81,7 +75,6 @@ describe('range', () => {
         max: 5,
         minEqual: true,
         maxEqual: false,
-        excludes: [],
       });
     });
   });
@@ -92,7 +85,6 @@ describe('range', () => {
         max: 10,
         minEqual: true,
         maxEqual: true,
-        excludes: [],
       });
     });
     it('should shrink range', () => {
@@ -101,22 +93,6 @@ describe('range', () => {
         max: 2,
         minEqual: true,
         maxEqual: false,
-        excludes: [],
-      });
-    });
-    it('should re-adjust excludes list', () => {
-      expect(module.setMax({
-        min: 1,
-        max: 10,
-        minEqual: false,
-        maxEqual: false,
-        excludes: [1, 2, 7, 10],
-      }, 7, true)).toEqual({
-        min: 1,
-        max: 7,
-        minEqual: false,
-        maxEqual: true,
-        excludes: [1, 2, 7],
       });
     });
   });
@@ -127,7 +103,6 @@ describe('range', () => {
         max: 5,
         minEqual: true,
         maxEqual: false,
-        excludes: [],
       });
     });
     it('should shrink range', () => {
@@ -136,22 +111,6 @@ describe('range', () => {
         max: 5,
         minEqual: false,
         maxEqual: false,
-        excludes: [],
-      });
-    });
-    it('should re-adjust excludes list', () => {
-      expect(module.setMin({
-        min: 1,
-        max: 10,
-        minEqual: false,
-        maxEqual: false,
-        excludes: [1, 2, 7, 10],
-      }, 7, true)).toEqual({
-        min: 7,
-        max: 10,
-        minEqual: true,
-        maxEqual: false,
-        excludes: [7, 10],
       });
     });
   });
@@ -165,7 +124,6 @@ describe('range', () => {
         max: Infinity,
         minEqual: true,
         maxEqual: true,
-        excludes: [],
       });
       expect(module.union(
         module.range(2, 5, true, false),
@@ -175,7 +133,6 @@ describe('range', () => {
         max: 5,
         minEqual: true,
         maxEqual: false,
-        excludes: [],
       });
     });
     it('should merge excludes', () => {
@@ -184,19 +141,16 @@ describe('range', () => {
         max: 10,
         minEqual: true,
         maxEqual: true,
-        excludes: [1, 2, 5, 7, 9],
       }, {
         min: 5,
         max: 15,
         minEqual: true,
         maxEqual: true,
-        excludes: [5, 7, 8, 9, 10, 15],
       })).toEqual({
         min: 0,
         max: 15,
         minEqual: true,
         maxEqual: true,
-        excludes: [1, 2, 5, 7, 9, 15],
       });
     });
   });
@@ -210,7 +164,6 @@ describe('range', () => {
         max: 5,
         minEqual: true,
         maxEqual: false,
-        excludes: [],
       });
       expect(module.intersection(
         module.gte(3),
@@ -220,7 +173,6 @@ describe('range', () => {
         max: 5,
         minEqual: true,
         maxEqual: false,
-        excludes: [],
       });
     });
     it('should return invalid range if not met', () => {
@@ -232,7 +184,6 @@ describe('range', () => {
         max: 5,
         minEqual: false,
         maxEqual: false,
-        excludes: [],
       });
     });
     it('should merge excludes', () => {
@@ -241,19 +192,16 @@ describe('range', () => {
         max: 10,
         minEqual: true,
         maxEqual: true,
-        excludes: [1, 2, 5, 7, 9],
       }, {
         min: 5,
         max: 15,
         minEqual: true,
         maxEqual: true,
-        excludes: [5, 7, 8, 9, 10, 15],
       })).toEqual({
         min: 5,
         max: 10,
         minEqual: true,
         maxEqual: true,
-        excludes: [5, 7, 8, 9, 10],
       });
     });
   });
@@ -270,15 +218,6 @@ describe('range', () => {
       expect(module.isValid(module.range(1, 1, false, true))).toBe(false);
       expect(module.isValid(module.range(1, 1, false, false))).toBe(false);
     });
-    it('should reject self-excluding point ranges', () => {
-      expect(module.isValid({
-        min: 1,
-        max: 1,
-        minEqual: true,
-        maxEqual: true,
-        excludes: [1],
-      })).toBe(false);
-    });
   });
   describe('test', () => {
     it('should pass correct ranges', () => {
@@ -289,13 +228,6 @@ describe('range', () => {
     });
     it('should pass incorrect ranges', () => {
       expect(module.test(module.range(1, 1, false, true), 1)).toBe(false);
-      expect(module.test({
-        min: 1,
-        max: 1,
-        minEqual: true,
-        maxEqual: true,
-        excludes: [1],
-      }, 1)).toBe(false);
       expect(module.test(module.range(1, 5, false, false), -10)).toBe(false);
     });
   });

@@ -1,5 +1,6 @@
 import { SetDescriptor } from './type';
 import createRangeModule, { Range } from './range';
+import { findValue } from './util';
 
 export type RangeSet<T> = Range<T>[];
 
@@ -22,14 +23,14 @@ export default function createRangeSetModule<T>(descriptor: SetDescriptor<T>) {
     invert: (input: RangeSet<T>): RangeSet<T> => {
       return [];
     },
-    union: (a: RangeSet<T>, b: RangeSet<T>): RangeSet<T> => {
+    or: (a: RangeSet<T>, b: RangeSet<T>): RangeSet<T> => {
       function process(current: Range<T>) {
         if (active != null) {
           const compared = descriptor.compare(active.max, current.min);
           if (compared > 0 ||
             (compared === 0 && (active.maxEqual || current.minEqual))
           ) {
-            active = rangeModule.union(active, current);
+            active = rangeModule.or(active, current);
             return;
           }
           output.push(active);
@@ -62,7 +63,7 @@ export default function createRangeSetModule<T>(descriptor: SetDescriptor<T>) {
       if (active != null) output.push(active);
       return output;
     },
-    intersection: (a: RangeSet<T>, b: RangeSet<T>): RangeSet<T> => {
+    and: (a: RangeSet<T>, b: RangeSet<T>): RangeSet<T> => {
       let aActive: Range<T> | null = null;
       let bActive: Range<T> | null = null;
       let aPos = 0;
@@ -76,7 +77,7 @@ export default function createRangeSetModule<T>(descriptor: SetDescriptor<T>) {
           if (bActive != null &&
             descriptor.compare(bActive.max, aActive.min) > 0
           ) {
-            output.push(rangeModule.intersection(aActive, bActive));
+            output.push(rangeModule.and(aActive, bActive));
           }
         }
         if (comp >= 0) {
@@ -85,7 +86,7 @@ export default function createRangeSetModule<T>(descriptor: SetDescriptor<T>) {
           if (aActive != null &&
             descriptor.compare(aActive.max, bActive.min) > 0
           ) {
-            output.push(rangeModule.intersection(aActive, bActive));
+            output.push(rangeModule.and(aActive, bActive));
           }
         }
       }
@@ -95,7 +96,7 @@ export default function createRangeSetModule<T>(descriptor: SetDescriptor<T>) {
         if (bActive != null &&
           descriptor.compare(bActive.max, aActive.min) > 0
         ) {
-          output.push(rangeModule.intersection(aActive, bActive));
+          output.push(rangeModule.and(aActive, bActive));
         }
       }
       while (bPos < b.length) {
@@ -104,13 +105,23 @@ export default function createRangeSetModule<T>(descriptor: SetDescriptor<T>) {
         if (aActive != null &&
           descriptor.compare(aActive.max, bActive.min) > 0
         ) {
-          output.push(rangeModule.intersection(aActive, bActive));
+          output.push(rangeModule.and(aActive, bActive));
         }
       }
       return output;
     },
     test: (rangeSet: RangeSet<T>, value: T): boolean => {
-      return false;
+      const { pos } = findValue(
+        rangeSet,
+        value,
+        descriptor.compare,
+        (v: Range<T>) => v.min,
+      );
+      let current = rangeSet[pos];
+      if (descriptor.compare(current.min, value) === 0 && !current.minEqual) {
+        current = rangeSet[pos - 1];
+      }
+      return rangeModule.test(current, value);
     },
   };
   return module;

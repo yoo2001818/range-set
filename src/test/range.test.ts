@@ -114,9 +114,9 @@ describe('range', () => {
       });
     });
   });
-  describe('union', () => {
+  describe('or', () => {
     it('should merge two ranges', () => {
-      expect(module.union(
+      expect(module.or(
         module.range(2, 5, true, false),
         module.gt(4),
       )).toEqual({
@@ -125,7 +125,7 @@ describe('range', () => {
         minEqual: true,
         maxEqual: true,
       });
-      expect(module.union(
+      expect(module.or(
         module.range(2, 5, true, false),
         module.lt(5),
       )).toEqual({
@@ -136,7 +136,7 @@ describe('range', () => {
       });
     });
     it('should merge excludes', () => {
-      expect(module.union({
+      expect(module.or({
         min: 0,
         max: 10,
         minEqual: true,
@@ -154,9 +154,9 @@ describe('range', () => {
       });
     });
   });
-  describe('intersection', () => {
+  describe('and', () => {
     it('should merge two ranges', () => {
-      expect(module.intersection(
+      expect(module.and(
         module.range(2, 5, true, false),
         module.range(4, 10, true, false),
       )).toEqual({
@@ -165,7 +165,7 @@ describe('range', () => {
         minEqual: true,
         maxEqual: false,
       });
-      expect(module.intersection(
+      expect(module.and(
         module.gte(3),
         module.lt(5)),
       ).toEqual({
@@ -176,7 +176,7 @@ describe('range', () => {
       });
     });
     it('should return invalid range if not met', () => {
-      expect(module.intersection(
+      expect(module.and(
         module.gt(10),
         module.lt(5)),
       ).toEqual({
@@ -187,7 +187,7 @@ describe('range', () => {
       });
     });
     it('should merge excludes', () => {
-      expect(module.intersection({
+      expect(module.and({
         min: 0,
         max: 10,
         minEqual: true,

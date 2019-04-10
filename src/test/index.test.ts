@@ -8,15 +8,15 @@ describe('index', () => {
     positiveInfinity: Infinity,
     negativeInfinity: -Infinity,
   });
-  describe('union', () => {
+  describe('or', () => {
     it('should merge gte / range', () => {
-      expect(module.union(
+      expect(module.or(
         module.range(1, 5),
         module.gte(5),
       )).toEqual(module.gt(1));
     });
     it('should merge two ranges without minEqual / maxEqual', () => {
-      expect(module.union(
+      expect(module.or(
         module.range(1, 5),
         module.range(5, 10),
       )).toEqual([
@@ -25,13 +25,13 @@ describe('index', () => {
       ]);
     });
     it('should merge two ranges with excludes', () => {
-      expect(module.union(
+      expect(module.or(
         module.range(1, 5),
         module.range(5, 10, true, true),
       )).toEqual(module.range(1, 10, false, true));
     });
     it('should merge multiple instances', () => {
-      expect(module.union(
+      expect(module.or(
         module.range(1, 10),
         [
           module.rangeModule.range(-1, 5),
@@ -45,21 +45,21 @@ describe('index', () => {
       ]);
     });
   });
-  describe('intersection', () => {
+  describe('and', () => {
     it('should merge gt / lt', () => {
-      expect(module.intersection(
+      expect(module.and(
         module.gte(1),
         module.lt(10),
       )).toEqual(module.range(1, 10, true, false));
     });
     it('should merge two ranges', () => {
-      expect(module.intersection(
+      expect(module.and(
         module.range(1, 5),
         module.range(3, 4, true, true),
       )).toEqual(module.range(3, 4, true, true));
     });
     it('should merge one long range / list of short ranges', () => {
-      expect(module.intersection(
+      expect(module.and(
         module.range(1, 10, true),
         [
           module.rangeModule.range(-1, 5),
@@ -72,6 +72,28 @@ describe('index', () => {
         module.rangeModule.range(5, 6),
         module.rangeModule.range(7, 10),
       ]);
+    });
+  });
+  describe('test', () => {
+    it('should return correct result', () => {
+      expect(module.test([
+        module.rangeModule.range(1, 2),
+        module.rangeModule.range(2, 3),
+        module.rangeModule.range(4, 100),
+        module.rangeModule.range(1000, 1005),
+      ], 2)).toBe(false);
+      expect(module.test([
+        module.rangeModule.range(1, 2, false, true),
+        module.rangeModule.range(2, 3),
+        module.rangeModule.range(4, 100),
+        module.rangeModule.range(1000, 1005),
+      ], 2)).toBe(true);
+      expect(module.test([
+        module.rangeModule.range(1, 2),
+        module.rangeModule.range(2, 3, true),
+        module.rangeModule.range(4, 100),
+        module.rangeModule.range(1000, 1005),
+      ], 2)).toBe(true);
     });
   });
 });

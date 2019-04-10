@@ -71,7 +71,7 @@ export default function createRangeModule<T>(descriptor: SetDescriptor<T>) {
       min,
       minEqual,
     }),
-    union: (a: Range<T>, b: Range<T>): Range<T> => {
+    or: (a: Range<T>, b: Range<T>): Range<T> => {
       const compMin = descriptor.compare(a.min, b.min);
       const compMax = descriptor.compare(a.max, b.max);
       const minMin = compMin < 0 ? a.min : b.min;
@@ -87,7 +87,7 @@ export default function createRangeModule<T>(descriptor: SetDescriptor<T>) {
           (compMax < 0 ? b.maxEqual : a.maxEqual || b.maxEqual),
       };
     },
-    intersection: (a: Range<T>, b: Range<T>): Range<T> => {
+    and: (a: Range<T>, b: Range<T>): Range<T> => {
       const compMin = descriptor.compare(a.min, b.min);
       const compMax = descriptor.compare(a.max, b.max);
       const minMax = compMin > 0 ? a.min : b.min;

@@ -89,6 +89,24 @@ export default function createRangeSetModule<T>(descriptor: SetDescriptor<T>) {
           }
         }
       }
+      while (aPos < a.length) {
+        aActive = a[aPos];
+        aPos += 1;
+        if (bActive != null &&
+          descriptor.compare(bActive.max, aActive.min) > 0
+        ) {
+          output.push(rangeModule.intersection(aActive, bActive));
+        }
+      }
+      while (bPos < b.length) {
+        bActive = b[bPos];
+        bPos += 1;
+        if (aActive != null &&
+          descriptor.compare(aActive.max, bActive.min) > 0
+        ) {
+          output.push(rangeModule.intersection(aActive, bActive));
+        }
+      }
       return output;
     },
     test: (rangeSet: RangeSet<T>, value: T): boolean => {

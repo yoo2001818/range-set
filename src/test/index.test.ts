@@ -45,4 +45,33 @@ describe('index', () => {
       ]);
     });
   });
+  describe('intersection', () => {
+    it('should merge gt / lt', () => {
+      expect(module.intersection(
+        module.gte(1),
+        module.lt(10),
+      )).toEqual(module.range(1, 10, true, false));
+    });
+    it('should merge two ranges', () => {
+      expect(module.intersection(
+        module.range(1, 5),
+        module.range(3, 4, true, true),
+      )).toEqual(module.range(3, 4, true, true));
+    });
+    it('should merge one long range / list of short ranges', () => {
+      expect(module.intersection(
+        module.range(1, 10, true),
+        [
+          module.rangeModule.range(-1, 5),
+          module.rangeModule.range(5, 6),
+          module.rangeModule.range(7, 10, false, true),
+          module.rangeModule.range(10, 12),
+        ]
+      )).toEqual([
+        module.rangeModule.range(1, 5, true),
+        module.rangeModule.range(5, 6),
+        module.rangeModule.range(7, 10),
+      ]);
+    });
+  });
 });

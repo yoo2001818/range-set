@@ -23,7 +23,7 @@ export default function createRangeSetModule<T>(descriptor: SetDescriptor<T>) {
     invert: (input: RangeSet<T>): RangeSet<T> => {
       return [];
     },
-    or: (a: RangeSet<T>, b: RangeSet<T>): RangeSet<T> => {
+    or: (...sets: RangeSet<T>[]): RangeSet<T> => {
       function process(current: Range<T>) {
         if (active != null) {
           const compared = descriptor.compare(active.max, current.min);
@@ -38,27 +38,26 @@ export default function createRangeSetModule<T>(descriptor: SetDescriptor<T>) {
         active = current;
       }
       let active: Range<T> | null = null;
-      let aPos = 0;
-      let bPos = 0;
       const output: Range<T>[] = [];
-      while (aPos < a.length && bPos < b.length) {
-        const comp = descriptor.compare(a[aPos].min, b[bPos].min);
-        if (comp <= 0) {
-          process(a[aPos]);
-          aPos += 1;
+      const currentSets: RangeSet<T>[] = sets;
+      const currentPos: number[] = sets.map(() => 0);
+      while (currentSets.length > 0) {
+        let minPos = 0;
+        let minValue = currentSets[0][currentPos[0]].min;
+        for (let i = 1; i < currentSets.length; i += 1) {
+          const range = currentSets[i][currentPos[i]];
+          const compMin = descriptor.compare(minValue, range.min);
+          if (compMin > 0) {
+            minValue = range.min;
+            minPos = i;
+          }
         }
-        if (comp >= 0) {
-          process(b[bPos]);
-          bPos += 1;
+        process(currentSets[minPos][currentPos[minPos]]);
+        currentPos[minPos] += 1;
+        if (currentPos[minPos] >= currentSets[minPos].length) {
+          currentPos.splice(minPos, 1);
+          currentSets.splice(minPos, 1);
         }
-      }
-      while (aPos < a.length) {
-        process(a[aPos]);
-        aPos += 1;
-      }
-      while (bPos < b.length) {
-        process(b[bPos]);
-        bPos += 1;
       }
       if (active != null) output.push(active);
       return output;

@@ -38,7 +38,7 @@ describe('index', () => {
           module.rangeModule.range(5, 8),
           module.rangeModule.range(10, 12, true),
           module.rangeModule.range(20, 30),
-        ]
+        ],
       )).toEqual([
         module.rangeModule.range(-1, 12),
         module.rangeModule.range(20, 30),
@@ -66,7 +66,7 @@ describe('index', () => {
           module.rangeModule.range(5, 6),
           module.rangeModule.range(7, 10, false, true),
           module.rangeModule.range(10, 12),
-        ]
+        ],
       )).toEqual([
         module.rangeModule.range(1, 5, true),
         module.rangeModule.range(5, 6),

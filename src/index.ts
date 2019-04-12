@@ -23,7 +23,23 @@ export default function createRangeSetModule<T>(descriptor: SetDescriptor<T>) {
     invert: (input: RangeSet<T>): RangeSet<T> => {
       return [];
     },
-    or: (...sets: RangeSet<T>[]): RangeSet<T> => {
+    or: (...ranges: RangeSet<T>[]): RangeSet<T> => {
+      if (ranges.length <= 1) {
+        return ranges[0];
+      }
+      let a;
+      let b;
+      if (ranges.length > 2) {
+        // Bisect the range array into two to perform this in log n level.
+        // Of course, this'll create lots of temporary objects... but
+        // better optimization can be done later.
+        const mid = Math.floor(ranges.length / 2);
+        a = module.or(...ranges.slice(0, mid));
+        b = module.or(...ranges.slice(mid));
+      } else {
+        a = ranges[0];
+        b = ranges[1];
+      }
       function process(current: Range<T>) {
         if (active != null) {
           const compared = descriptor.compare(active.max, current.min);
@@ -38,31 +54,48 @@ export default function createRangeSetModule<T>(descriptor: SetDescriptor<T>) {
         active = current;
       }
       let active: Range<T> | null = null;
+      let aPos = 0;
+      let bPos = 0;
       const output: Range<T>[] = [];
-      const currentSets: RangeSet<T>[] = sets;
-      const currentPos: number[] = sets.map(() => 0);
-      while (currentSets.length > 0) {
-        let minPos = 0;
-        let minValue = currentSets[0][currentPos[0]].min;
-        for (let i = 1; i < currentSets.length; i += 1) {
-          const range = currentSets[i][currentPos[i]];
-          const compMin = descriptor.compare(minValue, range.min);
-          if (compMin > 0) {
-            minValue = range.min;
-            minPos = i;
-          }
+      while (aPos < a.length && bPos < b.length) {
+        const comp = descriptor.compare(a[aPos].min, b[bPos].min);
+        if (comp <= 0) {
+          process(a[aPos]);
+          aPos += 1;
         }
-        process(currentSets[minPos][currentPos[minPos]]);
-        currentPos[minPos] += 1;
-        if (currentPos[minPos] >= currentSets[minPos].length) {
-          currentPos.splice(minPos, 1);
-          currentSets.splice(minPos, 1);
+        if (comp >= 0) {
+          process(b[bPos]);
+          bPos += 1;
         }
+      }
+      while (aPos < a.length) {
+        process(a[aPos]);
+        aPos += 1;
+      }
+      while (bPos < b.length) {
+        process(b[bPos]);
+        bPos += 1;
       }
       if (active != null) output.push(active);
       return output;
     },
-    and: (a: RangeSet<T>, b: RangeSet<T>): RangeSet<T> => {
+    and: (...ranges: RangeSet<T>[]): RangeSet<T> => {
+      if (ranges.length <= 1) {
+        return ranges[0];
+      }
+      let a;
+      let b;
+      if (ranges.length > 2) {
+        // Bisect the range array into two to perform this in log n level.
+        // Of course, this'll create lots of temporary objects... but
+        // better optimization can be done later.
+        const mid = Math.floor(ranges.length / 2);
+        a = module.and(...ranges.slice(0, mid));
+        b = module.and(...ranges.slice(mid));
+      } else {
+        a = ranges[0];
+        b = ranges[1];
+      }
       let aActive: Range<T> | null = null;
       let bActive: Range<T> | null = null;
       let aPos = 0;

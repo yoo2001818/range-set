@@ -14,13 +14,18 @@ export default function createRangeSetModule<T>(descriptor: SetDescriptor<T>) {
     lt: (value: T): RangeSet<T> => [rangeModule.lt(value)],
     lte: (value: T): RangeSet<T> => [rangeModule.lte(value)],
     all: (): RangeSet<T> => [rangeModule.all()],
+    neq: (value: T): RangeSet<T> => [
+      rangeModule.lt(value),
+      rangeModule.gt(value),
+    ],
     range: (
       min: T,
       max: T,
       minEqual: boolean = false,
       maxEqual: boolean = false,
     ): RangeSet<T> => [rangeModule.range(min, max, minEqual, maxEqual)],
-    invert: (input: RangeSet<T>): RangeSet<T> => {
+    not: (input: RangeSet<T>): RangeSet<T> => {
+      // -Infinity -> input[0].min, ..., input[-1].max -> Infinity
       return [];
     },
     or: (...ranges: RangeSet<T>[]): RangeSet<T> => {

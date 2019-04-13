@@ -44,6 +44,18 @@ describe('index', () => {
         module.rangeModule.range(20, 30),
       ]);
     });
+    it('should merge multiple sets', () => {
+      expect(module.or(
+        module.range(1, 5),
+        module.range(4, 10),
+        module.range(15, 20),
+        module.range(19, 22, false, true),
+        module.range(22, 24),
+      )).toEqual([
+        module.rangeModule.range(1, 10),
+        module.rangeModule.range(15, 24),
+      ]);
+    });
   });
   describe('and', () => {
     it('should merge gt / lt', () => {
@@ -72,6 +84,15 @@ describe('index', () => {
         module.rangeModule.range(5, 6),
         module.rangeModule.range(7, 10),
       ]);
+    });
+    it('should merge multiple sets', () => {
+      expect(module.and(
+        module.range(1, 20),
+        module.gt(4),
+        module.lt(19),
+        module.range(3, 10),
+        module.gte(6),
+      )).toEqual(module.range(6, 10, true, false));
     });
   });
   describe('test', () => {

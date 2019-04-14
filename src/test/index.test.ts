@@ -8,6 +8,32 @@ describe('index', () => {
     positiveInfinity: Infinity,
     negativeInfinity: -Infinity,
   });
+  describe('not', () => {
+    it('should invert the given input', () => {
+      expect(module.not([
+        module.rangeModule.range(1, 5, false, true),
+        module.rangeModule.range(8, 10),
+      ])).toEqual([
+        module.rangeModule.lte(1),
+        module.rangeModule.range(5, 8, false, true),
+        module.rangeModule.gte(10),
+      ]);
+    });
+    it('should invert lt / gt', () => {
+      expect(module.not([
+        module.rangeModule.lte(3),
+        module.rangeModule.gte(10),
+      ])).toEqual([
+        module.rangeModule.range(3, 10),
+      ]);
+      expect(module.not([
+        module.rangeModule.lt(3),
+        module.rangeModule.gt(10),
+      ])).toEqual([
+        module.rangeModule.range(3, 10, true, true),
+      ]);
+    });
+  });
   describe('or', () => {
     it('should merge gte / range', () => {
       expect(module.or(

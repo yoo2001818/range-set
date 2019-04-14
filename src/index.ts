@@ -25,8 +25,31 @@ export default function createRangeSetModule<T>(descriptor: SetDescriptor<T>) {
       maxEqual: boolean = false,
     ): RangeSet<T> => [rangeModule.range(min, max, minEqual, maxEqual)],
     not: (input: RangeSet<T>): RangeSet<T> => {
-      // -Infinity -> input[0].min, ..., input[-1].max -> Infinity
-      return [];
+      const output: RangeSet<T> = [];
+      let lastValue = descriptor.negativeInfinity;
+      let lastEqual = true;
+      for (let i = 0; i < input.length; i += 1) {
+        const entry = input[i];
+        if (!(descriptor.isNegativeInfinity(entry.min) && entry.minEqual)) {
+          output.push({
+            min: lastValue,
+            max: entry.min,
+            minEqual: lastEqual,
+            maxEqual: !entry.minEqual,
+          });
+        }
+        lastValue = entry.max;
+        lastEqual = !entry.maxEqual;
+      }
+      if (!(descriptor.isPositiveInfinity(lastValue) && !lastEqual)) {
+        output.push({
+          min: lastValue,
+          max: descriptor.positiveInfinity,
+          minEqual: lastEqual,
+          maxEqual: true,
+        });
+      }
+      return output;
     },
     or: (...ranges: RangeSet<T>[]): RangeSet<T> => {
       if (ranges.length <= 1) {

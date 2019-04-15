@@ -1,8 +1,9 @@
 {
   "name": "range-set",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Javascript library for modifying a set of ranges",
-  "main": "index.js",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
   "scripts": {
     "test": "npm run jest && npm run tslint",
     "jest": "jest --coverage --verbose",
@@ -19,6 +20,9 @@
   "bugs": {
     "url": "https://github.com/yoo2001818/range-set/issues"
   },
+  "files": [
+    "lib/"
+  ],
   "homepage": "https://github.com/yoo2001818/range-set#readme",
   "devDependencies": {
     "@types/jest": "^24.0.6",

@@ -120,6 +120,12 @@ describe('index', () => {
         module.gte(6),
       )).toEqual(module.range(6, 10, true, false));
     });
+    it('should not merge non-eq and eq', () => {
+      expect(module.and(
+        module.gt(1),
+        module.eq(1),
+      )).toEqual([]);
+    });
   });
   describe('test', () => {
     it('should return correct result', () => {

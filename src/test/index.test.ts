@@ -82,6 +82,12 @@ describe('index', () => {
         module.rangeModule.range(15, 24),
       ]);
     });
+    it('should merge non-eq and eq', () => {
+      expect(module.or(
+        module.neq(1),
+        module.eq(1),
+      )).toEqual(module.range(-Infinity, Infinity, true, true));
+    });
   });
   describe('and', () => {
     it('should merge gt / lt', () => {

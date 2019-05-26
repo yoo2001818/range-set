@@ -86,13 +86,19 @@ export default function createRangeSetModule<T>(descriptor: SetDescriptor<T>) {
       let bPos = 0;
       const output: Range<T>[] = [];
       while (aPos < a.length && bPos < b.length) {
-        const comp = descriptor.compare(a[aPos].min, b[bPos].min);
+        const aEntry = a[aPos];
+        const bEntry = b[bPos];
+        let comp = descriptor.compare(aEntry.min, bEntry.min);
+        if (comp === 0) {
+          if (!aEntry.minEqual && bEntry.minEqual) comp = 1;
+          else if (aEntry.minEqual && !bEntry.minEqual) comp = -1;
+        }
         if (comp <= 0) {
-          process(a[aPos]);
+          process(aEntry);
           aPos += 1;
         }
         if (comp >= 0) {
-          process(b[bPos]);
+          process(bEntry);
           bPos += 1;
         }
       }

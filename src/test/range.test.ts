@@ -175,16 +175,11 @@ describe('range', () => {
         maxEqual: false,
       });
     });
-    it('should return invalid range if not met', () => {
+    it('should return null if not met', () => {
       expect(module.and(
         module.gt(10),
         module.lt(5)),
-      ).toEqual({
-        min: 10,
-        max: 5,
-        minEqual: false,
-        maxEqual: false,
-      });
+      ).toEqual(null);
     });
     it('should merge excludes', () => {
       expect(module.and({

@@ -144,7 +144,7 @@ export default function createRangeSetModule<T>(descriptor: SetDescriptor<T>) {
             descriptor.compare(bActive.max, aActive.min) > 0
           ) {
             const result = rangeModule.and(aActive, bActive);
-            if (rangeModule.isValid(result)) output.push(result);
+            if (result != null) output.push(result);
           }
         }
         if (comp >= 0) {
@@ -154,7 +154,7 @@ export default function createRangeSetModule<T>(descriptor: SetDescriptor<T>) {
             descriptor.compare(aActive.max, bActive.min) > 0
           ) {
             const result = rangeModule.and(aActive, bActive);
-            if (rangeModule.isValid(result)) output.push(result);
+            if (result != null) output.push(result);
           }
         }
       }
@@ -165,7 +165,7 @@ export default function createRangeSetModule<T>(descriptor: SetDescriptor<T>) {
           descriptor.compare(bActive.max, aActive.min) > 0
         ) {
           const result = rangeModule.and(aActive, bActive);
-          if (rangeModule.isValid(result)) output.push(result);
+          if (result != null) output.push(result);
         }
       }
       while (bPos < b.length) {
@@ -175,7 +175,7 @@ export default function createRangeSetModule<T>(descriptor: SetDescriptor<T>) {
           descriptor.compare(aActive.max, bActive.min) > 0
         ) {
           const result = rangeModule.and(aActive, bActive);
-          if (rangeModule.isValid(result)) output.push(result);
+          if (result != null) output.push(result);
         }
       }
       return output;

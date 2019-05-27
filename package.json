@@ -1,6 +1,6 @@
 {
   "name": "range-set",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Javascript library for modifying a set of ranges",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",

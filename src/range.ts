@@ -85,7 +85,7 @@ export default function createRangeModule<T>(descriptor: SetDescriptor<T>) {
           (compMax < 0 ? b.maxEqual : a.maxEqual || b.maxEqual),
       };
     },
-    and: (...ranges: Range<T>[]): Range<T> => {
+    and: (...ranges: Range<T>[]): Range<T> | null => {
       let min = ranges[0].min;
       let minEqual = ranges[0].minEqual;
       let max = ranges[0].max;
@@ -107,6 +107,9 @@ export default function createRangeModule<T>(descriptor: SetDescriptor<T>) {
           maxEqual = maxEqual && range.maxEqual;
         }
       }
+      const comp = descriptor.compare(min, max);
+      if (comp > 0) return null;
+      if (comp === 0 && !(minEqual && maxEqual)) return null;
       return { min, max, minEqual, maxEqual };
     },
     isValid: (range: Range<T>): boolean => {
